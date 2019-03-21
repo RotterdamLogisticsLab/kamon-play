@@ -46,41 +46,7 @@ val scalatestplus26   = "org.scalatestplus.play"    %%  "scalatestplus-play"    
 
 lazy val kamonPlay = Project("kamon-play", file("."))
   .settings(noPublishing: _*)
-  .aggregate(kamonPlay24, kamonPlay25, kamonPlay26)
-
-
-lazy val kamonPlay24 = Project("kamon-play-24", file("kamon-play-2.4.x"))
-  .enablePlugins(JavaAgent)
-  .settings(Seq(
-      bintrayPackage := "kamon-play",
-      moduleName := "kamon-play-2.4",
-      scalaVersion := "2.11.12",
-      crossScalaVersions := Seq("2.11.12"),
-    testGrouping in Test := singleTestPerJvm((definedTests in Test).value, (javaOptions in Test).value)))
-  .settings(javaAgents += "org.aspectj" % "aspectjweaver"  % "1.9.2"  % "compile;test")
-  .settings(resolvers += Resolver.bintrayRepo("kamon-io", "snapshots"))
-  .settings(
-    libraryDependencies ++=
-      compileScope(kamonCore, kamonScala) ++
-      providedScope(aspectJ, play24, playWS24, typesafeConfig) ++
-      testScope(playTest24, scalatestplus24))
-
-lazy val kamonPlay25 = Project("kamon-play-25", file("kamon-play-2.5.x"))
-  .enablePlugins(JavaAgent)
-  .settings(Seq(
-      bintrayPackage := "kamon-play",
-      moduleName := "kamon-play-2.5",
-      scalaVersion := "2.11.12",
-      crossScalaVersions := Seq("2.11.12"),
-      testGrouping in Test := singleTestPerJvm((definedTests in Test).value, (javaOptions in Test).value)))
-  .settings(javaAgents += "org.aspectj" % "aspectjweaver"  % "1.9.2"  % "compile;test")
-  .settings(resolvers += Resolver.bintrayRepo("kamon-io", "snapshots"))
-  .settings(
-    libraryDependencies ++=
-      compileScope(kamonCore, kamonScala) ++
-      providedScope(aspectJ, play25, playWS25, typesafeConfig) ++
-      testScope(playTest25, scalatestplus25, kamonTestkit, logbackClassic))
-
+  .aggregate(kamonPlay26)
 
 lazy val kamonPlay26 = Project("kamon-play-26", file("kamon-play-2.6.x"))
   .enablePlugins(JavaAgent)
@@ -91,12 +57,23 @@ lazy val kamonPlay26 = Project("kamon-play-26", file("kamon-play-2.6.x"))
     crossScalaVersions := Seq("2.11.12", "2.12.8"),
     testGrouping in Test := singleTestPerJvm((definedTests in Test).value, (javaOptions in Test).value)))
   .settings(javaAgents += "org.aspectj" % "aspectjweaver"  % "1.9.2"  % "compile;test")
-  .settings(resolvers += Resolver.bintrayRepo("kamon-io", "snapshots"))
   .settings(
     libraryDependencies ++=
       compileScope(kamonCore, kamonScala) ++
       providedScope(aspectJ, play26, playNetty26, playAkkaHttp26, playWS26, typesafeConfig) ++
       testScope(playTest26, scalatestplus26, playLogBack26, kamonTestkit))
+  .settings(
+    credentials += (sys.env.get("ARTIFACT_REPO_USER") match {
+      case Some(repoUser) => Credentials("Artifactory Realm", "rll.jfrog.io", repoUser, sys.env("ARTIFACT_REPO_PASSWORD"))
+      case _ => Credentials(Path.userHome / ".ivy2" / ".pronto-credentials")
+    }))
+  .settings(
+    publishTo := {
+      if (isSnapshot.value)
+        Some("Artifactory Realm" at "https://rll.jfrog.io/rll/pronto-snapshots")
+      else
+        Some("Artifactory Realm" at "https://rll.jfrog.io/rll/pronto-releases")
+    })
 
 import sbt.Tests._
 def singleTestPerJvm(tests: Seq[TestDefinition], jvmSettings: Seq[String]): Seq[Group] =
