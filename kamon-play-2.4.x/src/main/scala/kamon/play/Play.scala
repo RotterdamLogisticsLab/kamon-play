@@ -17,6 +17,8 @@
 package kamon
 package play
 
+import java.net.URL
+
 import _root_.play.api.libs.ws.WSRequest
 import _root_.play.api.mvc.RequestHeader
 import com.typesafe.config.Config
@@ -78,5 +80,5 @@ class DefaultNameGenerator extends NameGenerator {
     })
   } getOrElse "UntaggedOperation"
 
-  def generateHttpClientOperationName(request: WSRequest): String = request.uri.getAuthority
+  def generateHttpClientOperationName(request: WSRequest): String = new URL(request.url).getAuthority
 }

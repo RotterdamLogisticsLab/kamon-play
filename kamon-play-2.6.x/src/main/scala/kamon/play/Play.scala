@@ -17,6 +17,8 @@
 package kamon
 package play
 
+import java.net.URL
+
 import _root_.play.api.libs.ws.StandaloneWSRequest
 import _root_.play.api.mvc.RequestHeader
 import com.typesafe.config.Config
@@ -79,5 +81,5 @@ class DefaultNameGenerator extends NameGenerator {
     })
   } getOrElse "UntaggedTrace"
 
-  def generateHttpClientOperationName(request: StandaloneWSRequest): String = request.uri.getAuthority
+  def generateHttpClientOperationName(request: StandaloneWSRequest): String = new URL(request.url).getAuthority
 }
