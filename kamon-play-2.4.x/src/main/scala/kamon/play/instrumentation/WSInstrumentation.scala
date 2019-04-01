@@ -42,7 +42,7 @@ class WSInstrumentation {
       .withMetricTag("span.kind", "client")
       .withMetricTag("component", "play.client.ws")
       .withMetricTag("http.method", request.method)
-      .withTag("http.url", request.uri.toString)
+      .withTag("http.url", request.url)
 
     val clientRequestSpan = currentContext.get(SpanCustomizer.ContextKey)
       .customize(clientSpanBuilder)
